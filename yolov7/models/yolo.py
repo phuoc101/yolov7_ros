@@ -495,7 +495,7 @@ class Model(nn.Module):
 
         # Init weights, biases
         initialize_weights(self)
-        self.info()
+        # self.info()
         logger.info('')
 
     def forward(self, x, augment=False, profile=False):
@@ -626,7 +626,7 @@ class Model(nn.Module):
             elif isinstance(m, IDetect):
                 m.fuse()
                 m.forward = m.fuseforward
-        self.info()
+        # self.info()
         return self
 
     def nms(self, mode=True):  # add or remove NMS module
