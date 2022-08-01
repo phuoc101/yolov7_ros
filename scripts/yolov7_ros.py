@@ -12,7 +12,7 @@ import os
 
 # add yolov7 submodule to path
 FILE_ABS_DIR = os.path.dirname(os.path.abspath(__file__))
-YOLOV7_ROOT = os.path.abspath(os.path.join(FILE_ABS_DIR, '../yolov7'))
+YOLOV7_ROOT = os.path.abspath(os.path.join(FILE_ABS_DIR, '../src/yolov7'))
 if str(YOLOV7_ROOT) not in sys.path:
     sys.path.append(str(YOLOV7_ROOT))
 from visualizer import draw_detections
@@ -43,7 +43,7 @@ def rescale(ori_shape, boxes, target_shape):
 
 class YoloV7_ROS:
     def __init__(self, weights, conf_thresh: float = 0.5, iou_thresh: float = 0.45,
-                 img_size: Tuple[int, int] = (640, 480), device: str = "cuda",
+                 img_size: int = 640, device: str = "cuda",
                  visualize: bool = True,
                  img_topic: str = "/image_raw",
                  pub_topic: str = "yolov7_detections"):
@@ -56,15 +56,17 @@ class YoloV7_ROS:
         self.__model = attempt_load(self.__weights, map_location=device)
         self.__names = self.__model.names
         self.__visualize = visualize
+        self.__img_topic = img_topic
+        self.__out_topic = pub_topic
         # ROS
         vis_topic = pub_topic + "visualization" if pub_topic.endswith("/") else \
             pub_topic + "/visualization"
         # self.visualization_publisher = rospy.Publisher(
         #     vis_topic, Image, queue_size=queue_size) if visualize else None
         self.img_subscriber = rospy.Subscriber(
-            img_topic, Image, self.__img_cb)
+            self.__img_topic, Image, self.__img_cb)
         self.detection_publisher = rospy.Publisher(
-            pub_topic, BoundingBoxes, queue_size=10)
+            self.__out_topic, BoundingBoxes, queue_size=10)
         self.bridge = CvBridge()
         self.model_info()
 
@@ -100,7 +102,9 @@ class YoloV7_ROS:
             + f"Weights: {self.__weights}\n" \
             + f"Confidence Threshold: {self.__conf_thresh}\n" \
             + f"IOU Threshold: {self.__iou_thresh}\n"\
-            + f"{len(list(self.__model.modules()))} layers, {n_p} parameters, {n_g} gradients{fs}"
+            + f"{len(list(self.__model.modules()))} layers, {n_p} parameters, {n_g} gradients{fs}\n"\
+            + f"Input topic: {self.__img_topic}\n"\
+            + f"Output topic: {self.__out_topic}"
         rospy.loginfo(summary)
 
     @torch.no_grad()
@@ -121,7 +125,9 @@ class YoloV7_ROS:
 
     def process_img(self, img_input):
         # automatically resize the image to the next smaller possible size
-        w_scaled, h_scaled = self.__img_size
+        h_ori, w_ori, _ = img_input.shape
+        w_scaled = self.__img_size
+        h_scaled = int(w_scaled * h_ori/w_ori)
 
         # w_scaled = w_orig - (w_orig % 8)
         np_img_resized = cv2.resize(img_input, (w_scaled, h_scaled))
@@ -136,15 +142,16 @@ class YoloV7_ROS:
 
     def __img_cb(self, img_msg):
         """ callback function for publisher """
-        w_scaled, h_scaled = self.__img_size
         frame = self.bridge.imgmsg_to_cv2(
             img_msg, desired_encoding='bgr8'
         )
-        h_orig, w_orig, c = frame.shape
+        h_ori, w_ori, c = frame.shape
+        w_scaled = self.__img_size
+        h_scaled = int(w_scaled * h_ori/w_ori)
         img_input = self.process_img(frame)
         detections = self.inference(img_input)
-        detections[:, :4] = rescale(
-            [h_scaled, w_scaled], detections[:, :4], [h_orig, w_orig])
+        # detections[:, :4] = rescale(
+        #     [h_scaled, w_scaled], detections[:, :4], [h_ori, w_ori])
         detections[:, :4] = detections[:, :4].round()
         # publishing
         detection_msg = create_detection_msg(img_msg, detections, self.__names)

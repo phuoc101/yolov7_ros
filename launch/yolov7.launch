@@ -1,0 +1,25 @@
+<launch>
+    <!-- Detection configuration -->
+    <arg name="weights_path"          default="weights/yolov7-tiny.pt"/>
+    <arg name="conf_thresh"           default="0.25"/>
+    <arg name="iou_thresh"            default="0.45"/>
+    <arg name="device"                default="cuda"/>
+    <arg name="img_size"              default="640"/>
+
+    <!-- Visualize using OpenCV window -->
+    <arg name="visualize"             default="true"/>
+
+    <!-- ROS topics -->
+    <arg name="img_topic"             default="/image_raw"/>
+    <arg name="out_topic"             default="/yolo/detections"/>
+
+    <node pkg="yolov7_ros" name="detect" type="detect.py" output="screen" ns="yolov7">
+        <param name="weights_path"          value="$(arg weights_path)"/>
+        <param name="conf_thresh"           value="$(arg conf_thresh)"/>
+        <param name="iou_thresh"            value="$(arg iou_thresh)" />
+        <param name="device"                value="$(arg device)" />
+        <param name="img_topic"             value="$(arg img_topic)"/>
+        <param name="out_topic"             value="$(arg out_topic)"/>
+        <param name="visualize"             value="$(arg visualize)"/>
+    </node>
+</launch>

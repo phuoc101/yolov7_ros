@@ -33,6 +33,7 @@ results/
 *.plan
 *.pth
 *.pt
+runs/
 
 # tests/
 
