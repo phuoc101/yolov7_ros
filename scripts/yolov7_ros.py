@@ -7,6 +7,7 @@ from typing import Tuple
 import rospy
 import cv2
 import numpy as np
+import random
 import sys
 import os
 
@@ -55,6 +56,7 @@ class YoloV7_ROS:
         self.__weights = weights
         self.__model = attempt_load(self.__weights, map_location=device)
         self.__names = self.__model.names
+        self.__colors = [[random.randint(0, 255) for _ in range(3)] for _ in self.__names]
         self.__visualize = visualize
         self.__img_topic = img_topic
         self.__out_topic = pub_topic
@@ -98,7 +100,7 @@ class YoloV7_ROS:
                 flops * img_size[0] / stride * img_size[1] / stride)  # 640x640 GFLOPS
         except (ImportError, Exception):
             fs = ''
-        summary = f"\N{rocket}\N{rocket}\N{rocket} Yolov7 Detector summary:\n" \
+        summary = f"\n\N{rocket}\N{rocket}\N{rocket} Yolov7 Detector summary:\n" \
             + f"Weights: {self.__weights}\n" \
             + f"Confidence Threshold: {self.__conf_thresh}\n" \
             + f"IOU Threshold: {self.__iou_thresh}\n"\
@@ -150,8 +152,8 @@ class YoloV7_ROS:
         h_scaled = int(w_scaled * h_ori/w_ori)
         img_input = self.process_img(frame)
         detections = self.inference(img_input)
-        # detections[:, :4] = rescale(
-        #     [h_scaled, w_scaled], detections[:, :4], [h_ori, w_ori])
+        detections[:, :4] = rescale(
+            [h_scaled, w_scaled], detections[:, :4], [h_ori, w_ori])
         detections[:, :4] = detections[:, :4].round()
         # publishing
         detection_msg = create_detection_msg(img_msg, detections, self.__names)
@@ -163,6 +165,6 @@ class YoloV7_ROS:
             classes = [int(c) for c in detections[:, 5].tolist()]
             conf = [float(c) for c in detections[:, 4].tolist()]
             vis_img = draw_detections(
-                frame, bboxes, classes, self.__names, conf)
+                frame, bboxes, classes, self.__names, conf, self.__colors)
             cv2.imshow("yolov7", vis_img)
             cv2.waitKey(1)

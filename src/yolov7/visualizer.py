@@ -3,14 +3,14 @@ import cv2
 from typing import List
 
 
-def get_random_color(seed):
-    gen = np.random.default_rng(seed)
-    color = tuple(gen.choice(range(256), size=3))
-    color = tuple([int(c) for c in color])
-    return color
+# def get_random_color(seed):
+#     gen = np.random.default_rng(seed)
+#     color = tuple(gen.choice(range(256), size=3))
+#     color = tuple([int(c) for c in color])
+#     return color
 
 
-def draw_detections(img: np.array, bboxes: List[List[int]], classes: List[int], names: List[str], conf: List[float]):
+def draw_detections(img: np.array, bboxes: List[List[int]], classes: List[int], names: List[str], conf: List[float], colors):
     line_thickness = 3
     tl = line_thickness or round(
         0.002 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
@@ -18,7 +18,7 @@ def draw_detections(img: np.array, bboxes: List[List[int]], classes: List[int], 
     for bbox, cls, prob in zip(bboxes, classes, conf):
         x1, y1, x2, y2 = bbox
 
-        color = get_random_color(int(cls))
+        color = colors[int(cls)]
         img = cv2.rectangle(
             img, (int(x1), int(y1)), (int(x2), int(y2)), color, tl)
         x_text = int(x1)
