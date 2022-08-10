@@ -46,8 +46,9 @@ class YoloV7_ROS:
     def __init__(self, weights, conf_thresh: float = 0.5, iou_thresh: float = 0.45,
                  img_size: int = 640, device: str = "cuda",
                  visualize: bool = True,
-                 img_topic: str = "/image_raw",
-                 pub_topic: str = "yolov7_detections"):
+                 input_img_topic: str = "/image_raw",
+                 pub_topic: str = "yolov7_detections",
+                 output_img_topic: str = "yolov7/image_raw"):
         rospy.loginfo("Starting Yolov7_ROS node")
         self.__conf_thresh = conf_thresh
         self.__iou_thresh = iou_thresh
@@ -58,17 +59,16 @@ class YoloV7_ROS:
         self.__names = self.__model.names
         self.__colors = [[random.randint(0, 255) for _ in range(3)] for _ in self.__names]
         self.__visualize = visualize
-        self.__img_topic = img_topic
-        self.__out_topic = pub_topic
+        self.__input_img_topic = input_img_topic
+        self.__output_topic = pub_topic
+        self.__output_img_topic = output_img_topic
         # ROS
-        vis_topic = pub_topic + "visualization" if pub_topic.endswith("/") else \
-            pub_topic + "/visualization"
-        # self.visualization_publisher = rospy.Publisher(
-        #     vis_topic, Image, queue_size=queue_size) if visualize else None
+        self.visualization_publisher = rospy.Publisher(
+            self.__output_img_topic, Image, queue_size=10) if visualize else None
         self.img_subscriber = rospy.Subscriber(
-            self.__img_topic, Image, self.__img_cb)
+            self.__input_img_topic, Image, self.__img_cb)
         self.detection_publisher = rospy.Publisher(
-            self.__out_topic, BoundingBoxes, queue_size=10)
+            self.__output_topic, BoundingBoxes, queue_size=10)
         self.bridge = CvBridge()
         self.model_info()
 
@@ -100,13 +100,14 @@ class YoloV7_ROS:
                 flops * img_size[0] / stride * img_size[1] / stride)  # 640x640 GFLOPS
         except (ImportError, Exception):
             fs = ''
-        summary = f"\n\N{rocket}\N{rocket}\N{rocket} Yolov7 Detector summary:\n" \
+        summary = f"\N{rocket}\N{rocket}\N{rocket} Yolov7 Detector summary:\n" \
             + f"Weights: {self.__weights}\n" \
             + f"Confidence Threshold: {self.__conf_thresh}\n" \
             + f"IOU Threshold: {self.__iou_thresh}\n"\
             + f"{len(list(self.__model.modules()))} layers, {n_p} parameters, {n_g} gradients{fs}\n"\
-            + f"Input topic: {self.__img_topic}\n"\
-            + f"Output topic: {self.__out_topic}"
+            + f"Input topic: {self.__input_img_topic}\n"\
+            + f"Output topic: {self.__output_topic}\n" \
+            + f"Output image topic: {self.__output_img_topic}"
         rospy.loginfo(summary)
 
     @torch.no_grad()
@@ -167,4 +168,7 @@ class YoloV7_ROS:
             vis_img = draw_detections(
                 frame, bboxes, classes, self.__names, conf, self.__colors)
             cv2.imshow("yolov7", vis_img)
+            vis_msg = self.bridge.cv2_to_imgmsg(vis_img, encoding="bgr8")
+            vis_msg.header.stamp = detection_msg.header.stamp
+            self.visualization_publisher.publish(vis_msg)
             cv2.waitKey(1)
