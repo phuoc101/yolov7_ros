@@ -15,7 +15,6 @@ FILE_ABS_DIR = os.path.dirname(os.path.abspath(__file__)) #nopep8
 YOLOV7_ROOT = os.path.abspath(os.path.join(FILE_ABS_DIR, '../src/yolov7')) #nopep8
 if str(YOLOV7_ROOT) not in sys.path: #nopep8
     sys.path.append(str(YOLOV7_ROOT)) #nopep8
-from utils.ros import create_detection_msg #nopep8
 from models.experimental import attempt_load #nopep8
 from utils.general import non_max_suppression #nopep8
 from visualizer import draw_detections #nopep8
@@ -152,6 +151,9 @@ class YoloV7:
                     cv2.imshow("yolov7", vis_img)
                     if cv2.waitKey(1) == ord('q'):
                         break
+            else:
+                logging.error(f"cannot open {self.__source}")
+                break
 
 def main(args):
     detector = YoloV7(args)
