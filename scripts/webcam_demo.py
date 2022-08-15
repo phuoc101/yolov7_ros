@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from torchvision.transforms import ToTensor
 import torch
 from typing import Tuple
