@@ -141,7 +141,7 @@ class YoloV7:
                 if self.__show_perf:
                     elapsed = end - start
                     logging.info(f"Inference time: {elapsed*1000:.2f} ms")
-                    logging.info(f"FPS: {1/elapsed:.2f} ms")
+                    logging.info(f"FPS: {1/elapsed:.2f}")
 
                 if self.__visualize:
                     bboxes = [[int(x1), int(y1), int(x2), int(y2)]
