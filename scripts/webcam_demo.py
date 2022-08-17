@@ -164,7 +164,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights',  type=str, default='weights/yolov7-tiny.pt', help='model.pt path(s)')
-    parser.add_argument('--source',  type=str, default='/dev/video0', help='model.pt path(s)')
+    parser.add_argument('--source',  type=str, default='/dev/video0', help='video source')
     parser.add_argument('--conf_thres', type=float, default=0.25, help='object confidence threshold')
     parser.add_argument('--iou_thres', type=float, default=0.45, help='IOU threshold for NMS')
     parser.add_argument('--img_size', type=int, default=640, help='inference size (pixels)')
