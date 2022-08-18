@@ -2,8 +2,6 @@
 This is a ROS package for object detection with [the official Yolov7](https://github.com/WongKinYiu/yolov7)
 
 ## Installation
-
-### Dependencies
 Built and tested on Python3.8, Ubuntu 20.04, ROS Noetic.
 
 * Clone the package and install dependencies for Yolov7 (follow the guide from the official repository, might be better to set up a virtual environment)
