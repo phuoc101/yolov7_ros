@@ -19,6 +19,11 @@ cd <YOUR_ROS_WORKSPACE>
 catkin build yolov7_ros
 source devel/setup.bash #or setup.zsh, depends on what shell you're using
 ```
+## Testing Yolov7 with webcam
+```bash
+cd scripts
+python3 webcam.demo --visualize --show_perf
+```
 
 ## Usage
 ```bash
@@ -29,7 +34,7 @@ roslaunch yolov7_ros yolov7_webcam.launch
 ```
 
 ## Custom weights
-Put the weights you want to use in `yolov7_ros/src/yolov7/weights` and specifying it during launching 
+* Put the weights you want to use in `yolov7_ros/src/yolov7/weights` and specifying it during launching 
 ```bash
 roslaunch yolov7_ros yolov7.launch weights:=weights/<YOUR_WEIGHTS>.pt
 # or
