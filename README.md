@@ -30,7 +30,7 @@ roslaunch yolov7_ros yolov7_webcam.launch
 
 ## Custom weights
 Put the weights you want to use in `yolov7_ros/src/yolov7/weights` and specifying it during launching 
-```
+```bash
 roslaunch yolov7_ros yolov7.launch weights:=weights/<YOUR_WEIGHTS>.pt
 # or
 roslaunch yolov7_ros yolov7_webcam.launch weights:=weights/<YOUR_WEIGHTS>.pt
