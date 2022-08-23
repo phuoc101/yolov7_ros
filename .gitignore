@@ -145,7 +145,6 @@ dmypy.json
 
 .vscode/
 output/
-datasets/
 vendor/vendor/
 vendor/
 log2.md
@@ -153,6 +152,8 @@ vendor/
 .DS_Store
 wandb/
 artifacts/
+datasets/picam*
+src/yolov7/data/picam*
 
 # ROS
 devel/
