@@ -1,6 +1,12 @@
 import os
 import glob
 import argparse
+from pylabel import importer
+
+def coco2yolo(dataset_name, dataset_path):
+    json_path = os.path.join(dataset_path, 'annotations/instances_default.json')
+    importer.ImportCoco(json_path).export.ExportToYoloV5(
+        output_path=os.path.join(dataset_path, 'labels'), yaml_file=dataset_name + '.yaml', cat_id_index=int(0))
 
 def main(opts):
     ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -25,6 +31,7 @@ def main(opts):
             for file in val_files:
                 f.write(file + '\n')
             f.close()
+    coco2yolo(opts.dataset, DATA_PATH)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
