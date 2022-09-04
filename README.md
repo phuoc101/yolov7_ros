@@ -6,6 +6,10 @@ Built and tested on Python3.8, Ubuntu 20.04, ROS Noetic.
 
 * Clone the package and install dependencies for Yolov7 (follow the guide from the official repository, might be better to set up a virtual environment)
   ```bash
+  virtualenv --system-site-packages -p python3.8 ~/ros_torch_env
+  ```
+
+  ```bash
   cd <YOUR_ROS_WORKSPACE>/src
   git clone https://github.com/phuoc101/yolov7_ros
   cd src/yolov7
