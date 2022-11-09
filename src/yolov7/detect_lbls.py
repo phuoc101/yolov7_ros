@@ -132,7 +132,6 @@ def detect(save_img=False):
 
         # Process detections
         for i, det in enumerate(pred):  # detections per image
-            print(f"DET: {det}")
             if webcam:  # batch_size >= 1
                 p, s, im0, frame = (
                     path[i],
@@ -144,7 +143,7 @@ def detect(save_img=False):
                 p, s, im0, frame = path, "", im0s, getattr(dataset, "frame", 0)
 
             p = Path(p)  # to Path
-            filename = Path(str(p.name).split(".")[0] + "txt")
+            filename = Path(str(p.name).split(".")[0])
             save_path = str(save_dir / p.name)  # img.jpg
             # txt_path = str(save_dir / "labels" / "frame") + (
             #     "" if dataset.mode == "image" else f"_{(frame-1):05d}"
@@ -178,7 +177,7 @@ def detect(save_img=False):
                             if opt.save_conf
                             else (cls, *xywh)
                         )  # label format
-                        print(line)
+                        # print(line)
                         with open(txt_path + ".txt", "a") as f:
                             f.write(("%g " * len(line)).rstrip() % line + "\n")
 
