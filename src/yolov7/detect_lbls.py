@@ -153,6 +153,9 @@ def detect(save_img=False):
             gn = torch.tensor(im0.shape)[
                 [1, 0, 1, 0]
             ]  # normalization gain whwh
+            if save_txt:
+                with open(txt_path + ".txt", "w+") as f:
+                    f.close()
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(
