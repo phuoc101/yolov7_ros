@@ -1,7 +1,7 @@
 import os
 import os.path as osp
 import argparse
-import logging
+from loguru import logger
 
 
 def get_label_dict(labels, dir):
@@ -37,9 +37,9 @@ def accumulate_predictions(preds_dict):
 def search_frame(preds_accumulate, lbl, conf, ext):
     for frame, pred in preds_accumulate.items():
         if pred[lbl] == conf:
-            logging.debug(f"Return frame {frame}, class: {lbl}, conf: {conf}")
+            logger.debug(f"Return frame {frame}, class: {lbl}, conf: {conf}")
             return frame + ext
-    logging.error(f"Frame not found")
+    logger.error("Frame not found")
 
 
 def choose_lowest_conf_frames(preds_accumulate, num_of_imgs, labels, ext):
@@ -76,10 +76,10 @@ def main(opts):
         labels=labels,
         ext=opts.ext,
     )
+    logger.info(f"Top frames: {top_frames_list}")
 
 
 if __name__ == "__main__":
-    logging.basicConfig(format="[%(levelname)s]: %(message)s", level=logging.DEBUG)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-d", "--dir", required=True, help="Directory with detections to read"
@@ -98,12 +98,12 @@ if __name__ == "__main__":
         default=10,
         help="Num of images to label",
     )
-    parser.add_argument(
-        "-c",
-        "--classes",
-        default=2,
-        type=int,
-        help='Number of classes. Default: 2 ("drone" and "person")',
-    )
+    # parser.add_argument(
+    #     "-c",
+    #     "--classes",
+    #     default=2,
+    #     type=int,
+    #     help='Number of classes. Default: 2 ("drone" and "person")',
+    # )
     opts = parser.parse_args()
     main(opts)
