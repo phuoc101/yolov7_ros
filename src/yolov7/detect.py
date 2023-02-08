@@ -92,7 +92,8 @@ def detect(save_img=False):
 
             p = Path(p)  # to Path
             save_path = str(save_dir / p.name)  # img.jpg
-            txt_path = str(save_dir / 'labels' / 'frame') + ('' if dataset.mode == 'image' else f'_{(frame-1):05d}')  # img.txt
+            # txt_path = str(save_dir / 'labels' / 'frame') + ('' if dataset.mode == 'image' else f'_{(frame-1):05d}')  # img.txt
+            txt_path = str(save_dir / 'labels' / p.name.replace(".png", ".txt"))  # img.txt
             s += '%gx%g ' % img.shape[2:]  # print string
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
             if len(det):
@@ -109,8 +110,7 @@ def detect(save_img=False):
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf) if opt.save_conf else (cls, *xywh)  # label format
-                        print(line)
-                        with open(txt_path + '.txt', 'a') as f:
+                        with open(txt_path, 'a') as f:
                             f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                     if save_img or view_img:  # Add bbox to image

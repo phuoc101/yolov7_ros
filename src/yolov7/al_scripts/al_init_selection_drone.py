@@ -24,17 +24,24 @@ def choose_images(files, num_chosen, chosen):
     return chosen_train, chosen_val
 
 
-def move_to_train_val(chosen_train, train_dir, chosen_val, val_dir):
-    for file in chosen_train:
-        basename = os.path.basename(file)
-        new_file = os.path.join(train_dir, basename)
-        shutil.move(file, new_file)
-        logger.info(f"{file} -> {new_file}")
-    for file in chosen_val:
-        basename = os.path.basename(file)
-        new_file = os.path.join(val_dir, basename)
-        shutil.move(file, new_file)
-        logger.info(f"{file} -> {new_file}")
+def move_chosen(chosen_train, train_dir, chosen_val=[], val_dir=[], addition=False):
+    if not addition:
+        for file in chosen_train:
+            basename = os.path.basename(file)
+            new_file = os.path.join(train_dir, basename)
+            shutil.move(file, new_file)
+            logger.info(f"{file} -> {new_file}")
+        for file in chosen_val:
+            basename = os.path.basename(file)
+            new_file = os.path.join(val_dir, basename)
+            shutil.move(file, new_file)
+            logger.info(f"{file} -> {new_file}")
+    else:
+        for file in chosen_train:
+            basename = os.path.basename(file)
+            new_file = os.path.join(train_dir, basename)
+            shutil.move(file, new_file)
+            logger.info(f"{file} -> {new_file}")
 
 
 def main(opts):
@@ -43,18 +50,20 @@ def main(opts):
     train_dir = os.path.join(dir, "train/images")
     val_dir = os.path.join(dir, "val/images")
     test_dir = os.path.join(dir, "test/images")
+    addition_dir = os.path.join(dir, "addition/images")
     os.makedirs(train_dir, exist_ok=True)
     os.makedirs(val_dir, exist_ok=True)
     os.makedirs(test_dir, exist_ok=True)
-    if len(os.listdir(val_dir)) != 0 or len(os.listdir(train_dir)):
-        logger.error(
-            "Validation and Training directories need to be both empty to initialize!"
-        )
-        sys.exit(1)
-    else:
-        logger.info(
-            "Both training and validation directories are empty, start initializing"
-        )
+    os.makedirs(addition_dir, exist_ok=True)
+    # if len(os.listdir(val_dir)) != 0 or len(os.listdir(train_dir)):
+    #     logger.error(
+    #         "Validation and Training directories need to be both empty to initialize!"
+    #     )
+    #     sys.exit(1)
+    # else:
+    #     logger.info(
+    #         "Both training and validation directories are empty, start initializing"
+    #     )
     chosen = []
     all_files = os.listdir(test_dir)
     num_of_files = len(all_files)
@@ -68,7 +77,19 @@ def main(opts):
         )
         logger.debug(f"Chosen for training: {chosen_train}")
         logger.debug(f"Chosen for validation: {chosen_val}")
-        move_to_train_val(chosen_train, train_dir, chosen_val, val_dir)
+        if not opts.addition:
+            move_chosen(chosen_train, train_dir, chosen_val, val_dir)
+        else:
+            move_chosen(chosen_train, addition_dir, addition=opts.addition)
+            # comply with CVAT
+            with open(
+                os.path.abspath(os.path.join(addition_dir, "../train.txt")), "a+"
+            ) as f:
+                lines = [
+                    "data/obj_train_data/" + os.path.basename(file) + "\n"
+                    for file in chosen_train
+                ]
+                f.writelines(lines)
 
 
 if __name__ == "__main__":
@@ -99,11 +120,21 @@ if __name__ == "__main__":
         help="File extension",
     )
     parser.add_argument(
+        "-a",
+        "--addition",
+        action="store_true",
+        help="File extension",
+    )
+    parser.add_argument(
         "-p",
         "--percentage",
         type=float,
         default=0,
-        help="Percentage of image to take from dataset (use either this or number of images, will prioritize this if both are selected)",
+        help=(
+            "Percentage of image to take from dataset ",
+            "(use either this or number of images, ",
+            "will prioritize this if both are selected)",
+        ),
     )
     opts = parser.parse_args()
     main(opts=opts)
