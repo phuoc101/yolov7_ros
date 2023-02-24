@@ -1,0 +1,30 @@
+<launch>
+    <!-- Detection configuration -->
+    <arg name="weights"               default="weights/yolov7-tiny.pt"/>
+    <arg name="xgb_weights"           default="weights/xgb_dist.txt"/>
+    <arg name="conf_thresh"           default="0.25"/>
+    <arg name="iou_thresh"            default="0.45"/>
+    <arg name="device"                default="cuda"/>
+    <arg name="img_size"              default="640"/>
+
+    <!-- Visualize using OpenCV window -->
+    <arg name="visualize"             default="true"/>
+
+    <!-- ROS topics -->
+    <arg name="input_img_topic"       default="/image_raw"/>
+    <!-- <arg name="output_img_topic"      default="/yolov7/image_raw"/> -->
+    <arg name="output_topic"          default="/yolov7/detections_dist"/>
+
+    <node pkg="yolov7_ros" name="detect_dist" type="detect_dist.py" output="screen" ns="yolov7">
+        <param name="weights"               value="$(arg weights)"/>
+        <param name="xgb_weights"           value="$(arg xgb_weights)"/>
+        <param name="conf_thresh"           value="$(arg conf_thresh)"/>
+        <param name="iou_thresh"            value="$(arg iou_thresh)" />
+        <param name="device"                value="$(arg device)" />
+        <param name="input_img_topic"       value="$(arg input_img_topic)"/>
+        <param name="img_size"              value="$(arg img_size)"/>
+        <!-- <param name="output_img_topic"      value="$(arg output_img_topic)"/> -->
+        <param name="output_topic"          value="$(arg output_topic)"/>
+        <param name="visualize"             value="$(arg visualize)"/>
+    </node>
+</launch>

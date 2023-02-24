@@ -4,7 +4,7 @@ from typing import List
 from std_msgs.msg import Header
 from geometry_msgs.msg import Pose2D
 from sensor_msgs.msg import Image
-from detection_msgs.msg import BoundingBox, BoundingBoxes
+from detection_msgs.msg import BoundingBox, BoundingBoxes, BoundingBoxDist, BoundingBoxesDist
 
 
 def create_header():
@@ -38,4 +38,32 @@ def create_detection_msg(img_msg: Image, detections: torch.Tensor, names: List[s
         bounding_boxes_msg.bounding_boxes.append(bbox)
     return bounding_boxes_msg
 
+
+def create_detection_with_dist_msg(
+    img_msg: Image, detections: torch.Tensor, dists: list, names: List[str]
+) -> BoundingBoxesDist:
+    """
+    :param img_msg: original ros image message
+    :param detections: torch tensor of shape [num_boxes, 6] where each element is
+        [x1, y1, x2, y2, confidence, class_id]
+    :returns: detections as a ros message of type Detection2DArray
+    """
+    bounding_boxes_msg = BoundingBoxesDist()
+
+    # header
+    header = create_header()
+    bounding_boxes_msg.header = header
+    for detection, dist in zip(detections, dists):
+        x1, y1, x2, y2, conf, cls = detection.tolist()
+        # bbox
+        bbox = BoundingBoxDist()
+        bbox.xmin = int(x1)
+        bbox.ymin = int(y1)
+        bbox.xmax = int(x2)
+        bbox.ymax = int(y2)
+        bbox.Class = names[int(cls)]
+        bbox.probability = conf
+        bbox.dist = float(dist)
+        bounding_boxes_msg.bounding_boxes.append(bbox)
+    return bounding_boxes_msg
 

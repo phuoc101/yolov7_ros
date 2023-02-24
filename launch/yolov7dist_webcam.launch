@@ -1,0 +1,19 @@
+<launch>
+    <arg name="video_device"          default="/dev/video0"/>
+    <arg name="pixel_format"          default="yuyv"/>
+    <node pkg="usb_cam" name="usb_cam" type="usb_cam_node" >
+        <param name="video_device"          value="$(arg video_device)" />
+        <param name="pixel_format"          value="$(arg pixel_format)" />
+        <remap from="/usb_cam/image_raw" to="/image_raw" />
+    </node>
+    <arg name="conf_thresh"           default="0.5"/>
+    <arg name="img_size"           default="640"/>
+    <arg name="weights"               default="weights/yolov7-tiny.pt"/>
+    <arg name="xgb_weights"               default="weights/xgb_dist.txt"/>
+    <include file="$(find yolov7_ros)/launch/yolov7dist.launch">
+        <arg name="conf_thresh"           value="$(arg conf_thresh)"/>
+        <arg name="weights"               value="$(arg weights)"/>
+        <arg name="xgb_weights"               value="$(arg xgb_weights)"/>
+        <arg name="img_size"               value="$(arg img_size)"/>
+    </include>
+</launch>
