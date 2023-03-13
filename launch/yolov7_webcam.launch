@@ -6,7 +6,7 @@
         <param name="pixel_format"          value="$(arg pixel_format)" />
         <remap from="/usb_cam/image_raw" to="/image_raw" />
     </node>
-    <arg name="conf_thresh"           default="0.5"/>
+    <arg name="conf_thresh"           default="0.3"/>
     <arg name="weights"               default="weights/yolov7-tiny.pt"/>
     <include file="$(find  yolov7_ros)/launch/yolov7.launch">
         <arg name="conf_thresh"           value="$(arg conf_thresh)"/>

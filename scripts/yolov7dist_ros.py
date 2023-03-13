@@ -201,6 +201,9 @@ class YoloV7Dist_ROS:
             classes = [int(c) for c in detections[:, 5].tolist()]
             conf = [float(c) for c in detections[:, 4].tolist()]
             vis_img = draw_detections(frame, bboxes, classes, self.__names, conf, self.__colors)
+            w_vis = 640
+            h_vis = 640
+            vis_img = cv2.resize(vis_img, (w_vis, h_vis), cv2.INTER_AREA)
             cv2.imshow("yolov7", vis_img)
             # vis_msg = self.bridge.cv2_to_imgmsg(vis_img, encoding="bgr8")
             # vis_msg.header.stamp = detection_msg.header.stamp

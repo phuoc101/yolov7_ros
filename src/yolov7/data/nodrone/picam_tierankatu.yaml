@@ -8,10 +8,9 @@
 
 
 # Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
-train: ./datasets/picam_data/Full_train_val_test/train # train images (relative to 'path') 128 images
-val: ./datasets/picam_data/Full_train_val_test/train  # val images (relative to 'path') 128 images
-# test:  # test images (optional)
+train: ./datasets/picam_data/HevoNaTiera/yolo_tierankatu_train_mini.txt # train images
+val: ./datasets/picam_data/Full_dataset_AL/yolo_Tierankatu3.txt  # val images (relative to 'path')
 
 # Classes
-nc: 2  # number of classes
-names: ['drone', 'person']  # class names
+nc: 1  # number of classes
+names: ['person']  # class names

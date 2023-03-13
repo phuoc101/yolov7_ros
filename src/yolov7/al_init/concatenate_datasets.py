@@ -22,6 +22,7 @@ def main(args):
                 shutil.copy(img, filename)
                 idx += 1
     layout_path = output_path.joinpath("ImageSets")
+    os.makedirs(layout_path, exist_ok=True)
     imgs_concat = sorted([im for im in output_path.rglob("*.png")])
     logger.debug(f"Concat imgs : {imgs_concat}")
     with open(layout_path.joinpath("unlabeled.txt"), "w+") as f:
